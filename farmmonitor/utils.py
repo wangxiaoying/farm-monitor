@@ -3,15 +3,14 @@ from enum import Enum
 import simplejson
 
 IMAGECHOICE = (
-    ('m', 'Moisture'),
-    ('t', 'Transpiration'),
-    ('n', 'Normal'),
+	('c', 'Compaction'),
+	('m', 'Moisture'),
+	('t', 'Transpiration'),
 )
 
 class MESSAGE(Enum):
 	s = 'Success'
 	f = 'Fail'
-	fg = 'Grid Not Exist'
 
 def generateHTTPResponse(message, key="result"):
 	result = {}
