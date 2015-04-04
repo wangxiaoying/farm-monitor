@@ -3,6 +3,9 @@ from farm.models import *
 from farm.forms import *
 from django.views.decorators.csrf import csrf_exempt
 
+import numpy as np
+from scipy import interpolate
+
 from utils import *
 
 @csrf_exempt
@@ -24,13 +27,11 @@ def NewSample(request):
 
 		form = PhotoForm(request.POST, request.FILES)
 		photo = None
-		print('form is valid?')
 		if form.is_valid():
-			print('form is valid')
 			photo = request.FILES['photo']
-
-		new_sample.photo = photo
-		new_sample.save()
+			if photo is not None:
+				new_sample.photo = photo
+				new_sample.save()
 
 		return generateHTTPResponse(MESSAGE.s.value)
 	except Exception as e:
@@ -38,68 +39,33 @@ def NewSample(request):
 		return generateHTTPResponse(MESSAGE.f.value)
 
 
-# @csrf_exempt
-# def NewGrid(request):
-# 	try:
-# 		rows = int(request.POST.get('rows'))
-# 		cols = int(request.POST.get('cols'))
-# 		west = int(request.POST.get('west'))
-# 		east = int(request.POST.get('east'))
-# 		north = int(request.POST.get('north'))
-# 		south = int(request.POST.get('south'))
-
-# 		Grid.objects.all().delete()
-
-# 		foot_x = (east-west) / cols
-# 		foot_y = (north-south) / rows
-# 		x = west
-# 		y = south
-		
-# 		for i in range(0, rows):
-# 			for j in range(0, cols):
-# 				print('%d, %d' % (x, y))
-# 				__Insert_Grid(x, x+foot_x, y, y+foot_y)
-# 				y = y+foot_y
-# 			x = x+foot_x
-# 			y = south
-
-# 		return generateHTTPResponse(MESSAGE.s.value)
-# 	except Exception as e:
-# 		print('Exception NewGrid', e)
-# 		return generateHTTPResponse(MESSAGE.f.value)	
-
-
-# @csrf_exempt
-# def NewMoisture(request):
-# 	try:
-# 		moisture = float(request.POST.get('moisture'))
-# 		pos_x = float(request.POST.get('pos_x'))
-# 		pos_y = float(request.POST.get('pos_y'))
-
-# 		grid = __Check_Grid(pos_x, pos_y)
-
-# 		print('grid_id', grid.id)
-
-# 		if grid is None:
-# 			return generateHTTPResponse(MESSAGE.fg.value)
-
-# 		new_moisture = Moisture(grid_id=grid, moisture=moisture)
-# 		new_moisture.save()
-# 		return generateHTTPResponse(MESSAGE.s.value)
-# 	except Exception as e:
-# 		print('Exception NewMoisture', e)
-# 		return generateHTTPResponse(MESSAGE.fg.value)
-
-
-
 ############################################################
 
 # calculate transpiration
-def __Get_Transpiration(leave_temp, air_temp, humidity):	
-	### transpiration algorithm:
-	ans = leave_temp+air_temp+humidity
+def __Get_Transpiration(leaf_temp, air_temp, humidity):	
+	# a0: Intercept of water stress line for tomatoes in sunlight (Temp[degC],Pressure[kPa])
+	# a1: Slope of water stress line for tomatoes in sunlight (Temp[degC],Pressure[kPa])
+	# t_svp: Temp range for empirical SVP(Saturated Vapor Pressure) relationship 
+	# p_svp: Pressures for empirical SVP(Saturated Vapor Pressure) relationship [kPa]
+	(a0, a1) = getWSLParameter()
+	(t_svp, p_svp) = getSVPParameter()
 
-	return ans
+	t_svp = np.array(t_svp)
+	p_svp = np.array(p_svp)
+
+	f_svp = interpolate.interp1d(t_svp, p_svp, kind='linear') # Linearly interpolate SVP relationship
+	svp_a = f_svp(air_temp) # SVP for air temp
+	vpd = (1-(humidity/100))*svp_a # VPD (Vapor Pressure Defecit)
+
+	NWSB = lambda vpdx: a0 + a1*(vpdx) # NWSB (Non-Water Stressed Baseline)
+
+	svp_leaf0 = f_svp(air_temp+a0) # SVP for leaf at theoretical 0 transpiration
+	vpd_neg = svp_leaf0 - svp_a # distance to travel back on VPD axis to intersect with NWSB
+	ws = a0 - a1 * vpd_neg # WS (Water Stress)
+
+	cwsi = (ws-(leaf_temp-air_temp))/(ws-NWSB(vpd)) # CWSI (Crop Water Stress Index)
+
+	return cwsi
 
 '''
 # generate moisture image
@@ -114,16 +80,6 @@ def __GenImg_Compaction():
 def __GenImg_Transpiration():
 
 '''
-
-# def __Check_Grid(x, y):
-# 	grid = Grid.objects.get(min_x__lte=x, min_y__lte=y, max_x__gt=x, max_y__gt=y)
-# 	return grid
-
-
-# def __Insert_Grid(min_x, max_x, min_y, max_y):
-# 	new_grid = Grid(min_x=min_x, max_x=max_x, min_y=min_y, max_y=max_y)
-# 	new_grid.save()
-
 
 
 
