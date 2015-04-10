@@ -6,6 +6,7 @@ admin.autodiscover()
 
 farm_patterns = patterns('farm.views',
 	url(r'^farm/newsample$', 'NewSample'),
+	url(r'^farm/testnetwork$', 'TestHttpConnection'),
 	# url(r'^farm/newgrid$', 'NewGrid'),
 	# url(r'^farm/newmoisture$', 'NewMoisture'),
 )

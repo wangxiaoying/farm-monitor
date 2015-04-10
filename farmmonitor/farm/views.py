@@ -38,6 +38,26 @@ def NewSample(request):
 		print('Exception NewSample', e)
 		return generateHTTPResponse(MESSAGE.f.value)
 
+@csrf_exempt
+def TestHttpConnection(request):
+	try:
+		msg = float(request.POST.get('message'))
+		print ('Message', msg)
+		form = PhotoForm(request.POST, request.FILES)
+		photo = None
+		if form.is_valid():
+			photo = request.FILES['photo']
+			if photo is not None:
+				print ('photo success!!!')
+
+		new_test = NetworkTest(message=msg, photo=photo)
+		new_test.save()
+			
+		return generateHTTPResponse(MESSAGE.s.value)
+	except Exception as e:
+		print('Exception TestHttpConnection', e)
+		return generateHTTPResponse(MESSAGE.f.value)
+
 
 ############################################################
 

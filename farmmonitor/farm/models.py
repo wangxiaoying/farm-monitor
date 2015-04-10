@@ -21,13 +21,20 @@ class Sample(models.Model):
 		return 'id: %d | pos: %.2f-%.2f' % (self.id, self.pos_x, self.pos_y)
 
 
-class Image(models.Model):
-	img_type = models.CharField(max_length=1, choices=IMAGECHOICE)
-	image = models.FileField(upload_to='image_file')
-	time = models.DateTimeField(auto_now_add=True)
+class NetworkTest(models.Model):
+	def photo_file(self, filename):
+		url = 'photos/test/%s' % (filename)
+		return url
+	message = models.DecimalField(max_digits=4, decimal_places=2)
+	photo = models.FileField(upload_to=photo_file)
 
-	def __unicode__(self):
-		return 'id: %d | type: %c' % (self.id, self.img_type)
+# class Image(models.Model):
+# 	img_type = models.CharField(max_length=1, choices=IMAGECHOICE)
+# 	image = models.FileField(upload_to='image_file')
+# 	time = models.DateTimeField(auto_now_add=True)
+
+# 	def __unicode__(self):
+# 		return 'id: %d | type: %c' % (self.id, self.img_type)
 
 # class Grid(models.Model):
 # 	min_x = models.DecimalField(max_digits=5, decimal_places=2)
