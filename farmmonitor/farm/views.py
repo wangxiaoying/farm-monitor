@@ -3,6 +3,8 @@ from farm.models import *
 from farm.forms import *
 from django.views.decorators.csrf import csrf_exempt
 
+import time
+from datetime import datetime
 import numpy as np
 from scipy import interpolate
 
@@ -11,18 +13,21 @@ from utils import *
 @csrf_exempt
 def NewSample(request):
 	try:
-		pos_x = float(request.POST.get('pos_x'))
-		pos_y = float(request.POST.get('pos_y'))
+		longtitude = request.POST.get('longtitude')
+		latitude = request.POST.get('latitude')
 		moisture = float(request.POST.get('moisture'))
-		compaction = float(request.POST.get('compaction'))
+		transpiration = float(request.POST.get('transpiration'))
 		air_temp = float(request.POST.get('air_temp'))
 		leave_temp = float(request.POST.get('leave_temp'))
 		humidity = float(request.POST.get('humidity'))
-		
-		transpiration = __Get_Transpiration(leave_temp, air_temp, humidity)
 
-		new_sample = Sample(pos_x=pos_x, pos_y=pos_y, moisture=moisture, compaction=compaction,
-			air_temp=air_temp, leave_temp=leave_temp, humidity=humidity, transpiration=transpiration)
+		date_time = time.strptime(request.POST.get('datetime'), '%m.%d.%Y %H%M.%S')
+		dt = datetime.fromtimestamp(time.mktime(date_time))
+
+		# transpiration = __Get_Transpiration(leave_temp, air_temp, humidity)
+
+		new_sample = Sample(longtitude=longtitude, latitude=latitude, moisture=moisture,
+			air_temp=air_temp, leave_temp=leave_temp, humidity=humidity, transpiration=transpiration, time=dt)
 		new_sample.save()
 
 		form = PhotoForm(request.POST, request.FILES)

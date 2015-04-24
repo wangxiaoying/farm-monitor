@@ -6,16 +6,15 @@ class Sample(models.Model):
 		url = 'photos/%s/%d-%s' % (self.time.date(), self.id, filename)
 		return url
 
-	pos_x = models.DecimalField(max_digits=5, decimal_places=2)
-	pos_y = models.DecimalField(max_digits=5, decimal_places=2)
-	moisture = models.DecimalField(max_digits=5, decimal_places=2)
-	compaction = models.DecimalField(max_digits=5, decimal_places=2)
-	air_temp = models.DecimalField(max_digits=4, decimal_places=2)
-	leave_temp = models.DecimalField(max_digits=4, decimal_places=2)
-	humidity = models.DecimalField(max_digits=5, decimal_places=2)
+	longtitude = models.CharField(max_length=20)
+	latitude = models.CharField(max_length=20)
+	moisture = models.DecimalField(max_digits=4, decimal_places=1)
+	air_temp = models.DecimalField(max_digits=4, decimal_places=1)
+	leave_temp = models.DecimalField(max_digits=4, decimal_places=1)
+	humidity = models.DecimalField(max_digits=4, decimal_places=1)
 	transpiration = models.DecimalField(max_digits=5, decimal_places=2)
 	photo = models.FileField(upload_to=photo_file)
-	time = models.DateTimeField(auto_now_add=True)
+	time = models.DateTimeField()
 
 	def __unicode__(self):
 		return 'id: %d | pos: %.2f-%.2f' % (self.id, self.pos_x, self.pos_y)
