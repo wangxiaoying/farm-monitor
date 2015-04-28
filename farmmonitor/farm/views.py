@@ -4,8 +4,9 @@ from farm.forms import *
 from django.views.decorators.csrf import csrf_exempt
 
 import time
-from datetime import datetime
+import simplejson
 import numpy as np
+from datetime import datetime, timedelta
 from scipy import interpolate
 
 from utils import *
@@ -43,6 +44,7 @@ def NewSample(request):
 		print('Exception NewSample', e)
 		return generateHTTPResponse(MESSAGE.f.value)
 
+
 @csrf_exempt
 def TestHttpConnection(request):
 	try:
@@ -63,6 +65,32 @@ def TestHttpConnection(request):
 		print('Exception TestHttpConnection', e)
 		return generateHTTPResponse(MESSAGE.f.value)
 
+
+@csrf_exempt
+def GetDataForHeatMap(request):
+	try:
+		# data_type = request.GET.get('data-type')
+		
+		# get data points in <2 days
+		now = datetime.now()
+		two_days_ago = now - timedelta(days=2)
+		points = Sample.objects.filter(time__range=(two_days_ago, now))
+
+		result = []
+		for p in points:
+			point = {}
+			point['longtitude'] = p.longtitude
+			point['latitude'] = p.latitude
+			point['moisture'] = p.moisture
+			point['transpiration'] = p.transpiration
+			result.append(point)
+
+		# print('points count:', len(result))
+		return HttpResponse(simplejson.dumps(result))
+	
+	except Exception as e:
+		print('Exception GetDataForHeatMap', e)
+		return generateHTTPResponse(MESSAGE.f.value)
 
 ############################################################
 
