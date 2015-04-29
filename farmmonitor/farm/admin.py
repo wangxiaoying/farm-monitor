@@ -6,7 +6,7 @@ class NetworkTestAdmin(admin.ModelAdmin):
 	list_display = ('id', 'message', 'photo')
 
 class SampleAdmin(admin.ModelAdmin):
-	list_display = ('id', 'longtitude', 'latitude', 'moisture', 'air_temp', 'leave_temp', 'humidity', 'transpiration', 'photo', 'time')
+	list_display = ('id', 'longtitude', 'latitude', 'moisture', 'air_temp', 'leaf_temp', 'humidity', 'transpiration', 'photo', 'time')
 
 admin.site.register(NetworkTest, NetworkTestAdmin)
 admin.site.register(Sample, SampleAdmin)

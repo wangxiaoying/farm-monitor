@@ -2,6 +2,7 @@ from django.shortcuts import render
 from farm.models import *
 from farm.forms import *
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
 
 import time
 import simplejson
@@ -19,16 +20,16 @@ def NewSample(request):
 		moisture = float(request.POST.get('moisture'))
 		transpiration = float(request.POST.get('transpiration'))
 		air_temp = float(request.POST.get('air_temp'))
-		leave_temp = float(request.POST.get('leave_temp'))
+		leaf_temp = float(request.POST.get('leaf_temp'))
 		humidity = float(request.POST.get('humidity'))
 
 		date_time = time.strptime(request.POST.get('datetime'), '%m.%d.%Y %H%M.%S')
 		dt = datetime.fromtimestamp(time.mktime(date_time))
 
-		# transpiration = __Get_Transpiration(leave_temp, air_temp, humidity)
+		# transpiration = __Get_Transpiration(leaf_temp, air_temp, humidity)
 
 		new_sample = Sample(longtitude=longtitude, latitude=latitude, moisture=moisture,
-			air_temp=air_temp, leave_temp=leave_temp, humidity=humidity, transpiration=transpiration, time=dt)
+			air_temp=air_temp, leaf_temp=leaf_temp, humidity=humidity, transpiration=transpiration, time=dt)
 		new_sample.save()
 
 		form = PhotoForm(request.POST, request.FILES)
@@ -67,7 +68,7 @@ def TestHttpConnection(request):
 
 
 @csrf_exempt
-def GetDataForHeatMap(request):
+def GetDataPoints(request):
 	try:
 		# data_type = request.GET.get('data-type')
 		
@@ -79,6 +80,7 @@ def GetDataForHeatMap(request):
 		result = []
 		for p in points:
 			point = {}
+			point['id'] = p.id
 			point['longtitude'] = p.longtitude
 			point['latitude'] = p.latitude
 			point['moisture'] = p.moisture
@@ -90,6 +92,60 @@ def GetDataForHeatMap(request):
 	
 	except Exception as e:
 		print('Exception GetDataForHeatMap', e)
+		return generateHTTPResponse(MESSAGE.f.value)
+
+@csrf_exempt
+def GetPointDetail(request):
+	try:
+		pid = request.GET.get('id')
+		point = Sample.objects.get(id=pid)
+
+		result = {}
+		result['id'] = point.id
+		result['longtitude'] = point.longtitude
+		result['latitude'] = point.latitude
+		result['moisture'] = point.moisture
+		result['air_temp'] = point.air_temp
+		result['leaf_temp'] = point.leaf_temp
+		result['humidity'] = point.humidity
+		result['transpiration'] = point.transpiration
+		result['time'] = point.time.strftime(getDatetimeFormat())
+		if point.photo:
+			result['photo'] = point.photo.url	
+
+		return HttpResponse(simplejson.dumps(result))
+
+	except Exception as e:
+		print('Exception GetPointDetail', e)
+		return generateHTTPResponse(MESSAGE.f.value)
+
+@csrf_exempt
+def GetHistoryData(request):
+	try:
+		time_from = request.GET.get('time_from')
+		time_to = request.GET.get('time_to')
+
+		points = Sample.objects.filter(Q(time__gte=time_from), Q(time__lte=time_to))
+		result = []
+		for p in points:
+			point = {}
+			point['id'] = p.id
+			point['longtitude'] = p.longtitude
+			point['latitude'] = p.latitude
+			point['moisture'] = p.moisture
+			point['air_temp'] = p.air_temp
+			point['leaf_temp'] = p.leaf_temp
+			point['humidity'] = p.humidity
+			point['transpiration'] = p.transpiration
+			point['time'] = p.time.strftime(getDatetimeFormat())
+			if p.photo:
+				point['photo'] = p.photo.url
+
+			result.append(point)
+		return HttpResponse(simplejson.dumps(result))
+
+	except Exception as e:
+		print('Exception GetHistoryData', e)
 		return generateHTTPResponse(MESSAGE.f.value)
 
 ############################################################

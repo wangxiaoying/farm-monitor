@@ -10,7 +10,7 @@ class Sample(models.Model):
 	latitude = models.CharField(max_length=20)
 	moisture = models.DecimalField(max_digits=4, decimal_places=1)
 	air_temp = models.DecimalField(max_digits=4, decimal_places=1)
-	leave_temp = models.DecimalField(max_digits=4, decimal_places=1)
+	leaf_temp = models.DecimalField(max_digits=4, decimal_places=1)
 	humidity = models.DecimalField(max_digits=4, decimal_places=1)
 	transpiration = models.DecimalField(max_digits=5, decimal_places=2)
 	photo = models.FileField(upload_to=photo_file)
