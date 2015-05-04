@@ -15,8 +15,10 @@ from utils import *
 @csrf_exempt
 def NewSample(request):
 	try:
-		longtitude = request.POST.get('longtitude')
-		latitude = request.POST.get('latitude')
+		longtitude = float(request.POST.get('longtitude'))
+		print (longtitude)
+		latitude = float(request.POST.get('latitude'))
+		print (latitude)
 		moisture = float(request.POST.get('moisture'))
 		transpiration = float(request.POST.get('transpiration'))
 		air_temp = float(request.POST.get('air_temp'))

@@ -6,8 +6,8 @@ class Sample(models.Model):
 		url = 'photos/%s/%d-%s' % (self.time.date(), self.id, filename)
 		return url
 
-	longtitude = models.CharField(max_length=20)
-	latitude = models.CharField(max_length=20)
+	longtitude = models.DecimalField(max_digits=9, decimal_places=4)
+	latitude = models.DecimalField(max_digits=9, decimal_places=4)
 	moisture = models.DecimalField(max_digits=4, decimal_places=1)
 	air_temp = models.DecimalField(max_digits=4, decimal_places=1)
 	leaf_temp = models.DecimalField(max_digits=4, decimal_places=1)
