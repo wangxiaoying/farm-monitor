@@ -3,6 +3,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 admin.autodiscover()
 
+from farmmonitor.settings import *
+
 
 farm_patterns = patterns('farm.views',
 	url(r'^farm/newsample$', 'NewSample'),
@@ -20,4 +22,5 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': MEDIA_ROOT }),
 ) + farm_patterns
