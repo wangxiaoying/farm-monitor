@@ -17,7 +17,7 @@ class Sample(models.Model):
 	time = models.DateTimeField()
 
 	def __unicode__(self):
-		return 'id: %d | pos: %.2f-%.2f' % (self.id, self.pos_x, self.pos_y)
+		return 'id: %d' % (self.id)
 
 
 class NetworkTest(models.Model):
