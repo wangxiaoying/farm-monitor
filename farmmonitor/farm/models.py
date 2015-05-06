@@ -13,7 +13,7 @@ class Sample(models.Model):
 	leaf_temp = models.DecimalField(max_digits=4, decimal_places=1)
 	humidity = models.DecimalField(max_digits=4, decimal_places=1)
 	transpiration = models.DecimalField(max_digits=5, decimal_places=2)
-	photo = models.FileField(upload_to=photo_file)
+	photo = models.FileField(upload_to=photo_file, blank=True)
 	time = models.DateTimeField()
 
 	def __unicode__(self):
