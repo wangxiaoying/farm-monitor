@@ -31,5 +31,14 @@ def getDatetimeFormat():
 def getDateFormat():
 	return ('%Y-%m-%d')
 
-def getImpoDataMax():
-	return 20
+def getImpoDataMax(x):
+	return {
+        'transpiration': 20,
+        'moisture': 30,
+    }[x]
+
+def getImpoDataMin(x):
+	return{
+		'transpiration': 50,
+		'moisture': 60,
+	}[x]

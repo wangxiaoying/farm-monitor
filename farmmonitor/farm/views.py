@@ -155,7 +155,8 @@ def GetImportantData(request):
 	try:
 		now = datetime.now()
 		two_days_ago = now - timedelta(days=2)
-		points = Sample.objects.filter(time__range=(two_days_ago, now), transpiration__lt=getImpoDataMax())
+		points = Sample.objects.filter(time__range=(two_days_ago, now)).filter(Q(transpiration__lt=getImpoDataMax('transpiration'))|
+			Q(transpiration__gt=getImpoDataMin('transpiration'))|Q(moisture__lt=getImpoDataMax('moisture'))|Q(moisture__gt=getImpoDataMin('moisture')))
 
 		result = []
 		for p in points:
