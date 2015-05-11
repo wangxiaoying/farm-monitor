@@ -30,3 +30,6 @@ def getDatetimeFormat():
 
 def getDateFormat():
 	return ('%Y-%m-%d')
+
+def getImpoDataMax():
+	return 20

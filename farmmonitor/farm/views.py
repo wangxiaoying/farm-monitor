@@ -150,6 +150,29 @@ def GetHistoryData(request):
 		print('Exception GetHistoryData', e)
 		return generateHTTPResponse(MESSAGE.f.value)
 
+@csrf_exempt
+def GetImportantData(request):
+	try:
+		now = datetime.now()
+		two_days_ago = now - timedelta(days=2)
+		points = Sample.objects.filter(time__range=(two_days_ago, now), transpiration__lt=getImpoDataMax())
+
+		result = []
+		for p in points:
+			point = {}
+			point['id'] = p.id
+			point['longtitude'] = p.longtitude
+			point['latitude'] = p.latitude
+			point['moisture'] = p.moisture
+			point['transpiration'] = p.transpiration
+			result.append(point)
+
+		# print('points count:', len(result))
+		return HttpResponse(simplejson.dumps(result))
+
+	except Exception as e:
+		print('Exception GetImportantData', e)
+		return generateHTTPResponse(MESSAGE.f.value)
 ############################################################
 
 # calculate transpiration
