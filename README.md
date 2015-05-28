@@ -1,4 +1,4 @@
-# farm-monitor
+# Farm Monitor Server
 
 ## Environment
 
@@ -23,9 +23,25 @@
 * numpy
 * scipy
 
+## Database
+
+Field         | Type         | Remark 					   | Description
+------ 		  | ------ 		 | ------ 					   | ------
+id            | int(11)      | primary key, auto_increment | point identification		
+longtitude    | decimal(9,4) |                     		   | longtitued of the point
+latitude      | decimal(9,4) |                     		   | latitude of the point
+moisture      | decimal(4,1) |                     		   | soil moisture of the point
+air_temp      | decimal(4,1) |                     		   | air temperature of the point
+leaf_temp     | decimal(4,1) |                     		   | leaf temperature of the point
+humidity      | decimal(4,1) |                     		   | humidity of the point
+transpiration | decimal(5,2) |                     		   | calculated by air_temp, leaf_temp and humidity
+photo         | varchar(100) |                     		   | url of the photo
+time          | datetime     |                     		   | time of acquisition
+
 ## API Reference
 
 #### Global Rules
 
 * DATE_FORMAT: yyyy-MM-dd hh:mm:ss
+
 
