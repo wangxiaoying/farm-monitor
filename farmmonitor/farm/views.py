@@ -154,7 +154,7 @@ def GetImportantData(request):
 def __Get_Data(time_from, time_to):
 	points = Sample.objects.filter(Q(time__gte=time_from), Q(time__lte=time_to))
 	if 0 == len(points):
-		points = Sample.objects.all().order_by('time')[:10]
+		points = Sample.objects.all().order_by('-time')[:10]
 
 	result = []
 	for p in points:
