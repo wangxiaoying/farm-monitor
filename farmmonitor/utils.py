@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import *
 from enum import Enum
 import simplejson
 
@@ -12,10 +12,16 @@ class MESSAGE(Enum):
 	s = 'Success'
 	f = 'Fail'
 
-def generateHTTPResponse(message, key="result"):
+http_response = {
+	'Success': HttpResponse,
+	'Fail': HttpResponseServerError,
+}
+
+def generateHTTPResponse(function, key):
 	result = {}
-	result[key] = message
-	return HttpResponse(simplejson.dumps(result))
+	result[key] = function
+
+	return http_response[key](simplejson.dumps(result))
 
 def getWSLParameter():
 	return (2.86, -1.96)
@@ -31,14 +37,14 @@ def getDatetimeFormat():
 def getDateFormat():
 	return ('%Y-%m-%d')
 
-def getImpoDataMax(x):
-	return {
-        'transpiration': 20,
-        'moisture': 30,
-    }[x]
+# def getImpoDataMax(x):
+# 	return {
+#         'transpiration': 20,
+#         'moisture': 30,
+#     }[x]
 
-def getImpoDataMin(x):
-	return{
-		'transpiration': 50,
-		'moisture': 60,
-	}[x]
+# def getImpoDataMin(x):
+# 	return{
+# 		'transpiration': 50,
+# 		'moisture': 60,
+# 	}[x]

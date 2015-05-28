@@ -16,9 +16,7 @@ from utils import *
 def NewSample(request):
 	try:
 		longtitude = float(request.POST.get('longtitude'))
-		print (longtitude)
 		latitude = float(request.POST.get('latitude'))
-		print (latitude)
 		moisture = float(request.POST.get('moisture'))
 		transpiration = float(request.POST.get('transpiration'))
 		air_temp = float(request.POST.get('air_temp'))
@@ -42,10 +40,10 @@ def NewSample(request):
 				new_sample.photo = photo
 				new_sample.save()
 
-		return generateHTTPResponse(MESSAGE.s.value)
+		return generateHTTPResponse('NewSample', MESSAGE.s.value)
 	except Exception as e:
 		print('Exception NewSample', e)
-		return generateHTTPResponse(MESSAGE.f.value)
+		return generateHTTPResponse('NewSample', MESSAGE.f.value)
 
 
 @csrf_exempt
@@ -63,38 +61,40 @@ def TestHttpConnection(request):
 		new_test = NetworkTest(message=msg, photo=photo)
 		new_test.save()
 			
-		return generateHTTPResponse(MESSAGE.s.value)
+		return generateHTTPResponse('TestHttpConnection', MESSAGE.s.value)
 	except Exception as e:
 		print('Exception TestHttpConnection', e)
-		return generateHTTPResponse(MESSAGE.f.value)
+		return generateHTTPResponse('TestHttpConnection', MESSAGE.f.value)
 
 
 @csrf_exempt
 def GetDataPoints(request):
 	try:
-		# data_type = request.GET.get('data-type')
-		
 		# get data points in <2 days
 		now = datetime.now()
 		two_days_ago = now - timedelta(days=2)
-		points = Sample.objects.filter(time__range=(two_days_ago, now))
+		
+		result = __Get_Data(two_days_ago, now)
 
-		result = []
-		for p in points:
-			point = {}
-			point['id'] = p.id
-			point['longtitude'] = p.longtitude
-			point['latitude'] = p.latitude
-			point['moisture'] = p.moisture
-			point['transpiration'] = p.transpiration
-			result.append(point)
-
-		# print('points count:', len(result))
 		return HttpResponse(simplejson.dumps(result))
 	
 	except Exception as e:
 		print('Exception GetDataForHeatMap', e)
-		return generateHTTPResponse(MESSAGE.f.value)
+		return generateHTTPResponse('GetDataPoints', MESSAGE.f.value)
+
+@csrf_exempt
+def GetHistoryData(request):
+	try:
+		time_from = request.GET.get('time_from')
+		time_to = request.GET.get('time_to')
+
+		result = __Get_Data(time_from, time_to)
+
+		return HttpResponse(simplejson.dumps(result))
+
+	except Exception as e:
+		print('Exception GetHistoryData', e)
+		return generateHTTPResponse('GetHistoryData', MESSAGE.f.value)
 
 @csrf_exempt
 def GetPointDetail(request):
@@ -119,36 +119,8 @@ def GetPointDetail(request):
 
 	except Exception as e:
 		print('Exception GetPointDetail', e)
-		return generateHTTPResponse(MESSAGE.f.value)
+		return generateHTTPResponse('GetPointDetail', MESSAGE.f.value)
 
-@csrf_exempt
-def GetHistoryData(request):
-	try:
-		time_from = request.GET.get('time_from')
-		time_to = request.GET.get('time_to')
-
-		points = Sample.objects.filter(Q(time__gte=time_from), Q(time__lte=time_to))
-		result = []
-		for p in points:
-			point = {}
-			point['id'] = p.id
-			point['longtitude'] = p.longtitude
-			point['latitude'] = p.latitude
-			point['moisture'] = p.moisture
-			point['air_temp'] = p.air_temp
-			point['leaf_temp'] = p.leaf_temp
-			point['humidity'] = p.humidity
-			point['transpiration'] = p.transpiration
-			point['time'] = p.time.strftime(getDatetimeFormat())
-			if p.photo:
-				point['photo'] = p.photo.url
-
-			result.append(point)
-		return HttpResponse(simplejson.dumps(result))
-
-	except Exception as e:
-		print('Exception GetHistoryData', e)
-		return generateHTTPResponse(MESSAGE.f.value)
 
 @csrf_exempt
 def GetImportantData(request):
@@ -174,7 +146,32 @@ def GetImportantData(request):
 	except Exception as e:
 		print('Exception GetImportantData', e)
 		return generateHTTPResponse(MESSAGE.f.value)
+
+
+
 ############################################################
+
+def __Get_Data(time_from, time_to):
+	points = Sample.objects.filter(Q(time__gte=time_from), Q(time__lte=time_to))
+	
+	result = []
+	for p in points:
+		point = {}
+		point['id'] = p.id
+		point['longtitude'] = p.longtitude
+		point['latitude'] = p.latitude
+		point['moisture'] = p.moisture
+		point['air_temp'] = p.air_temp
+		point['leaf_temp'] = p.leaf_temp
+		point['humidity'] = p.humidity
+		point['transpiration'] = p.transpiration
+		point['time'] = p.time.strftime(getDatetimeFormat())
+		if p.photo:
+			point['photo'] = p.photo.url
+		result.append(point)
+
+	return result
+
 
 # calculate transpiration
 def __Get_Transpiration(leaf_temp, air_temp, humidity):	
