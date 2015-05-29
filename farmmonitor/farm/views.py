@@ -207,6 +207,10 @@ def __Do_Interpolate(x, y, zm, zt):
 	result['min-y'] = min(y)
 	result['max-x'] = max(x)
 	result['max-y'] = max(y)
+	result['max-m'] = max(zm)
+	result['min-m'] = min(zm)
+	result['max-t'] = max(t)
+	result['min-t'] = min(t)
 	result['all-moist'] = zmi
 	result['all-trans'] = zti
 

@@ -107,15 +107,22 @@ time          | datetime     |                     		   | time of acquisition
 	* Description: get point detail by id
 	* Return
 		* Success
-			* __longtitude__: _text number ±xxx.xxxx_ 
-			* __latitude__: _text numer ±xx.xxxx_
-			* __moisture__: _text number ±xxx.x_
-			* __transpiration__: _text number ±xxx.xx_
-			* __air_temp__: _text number ±xxx.x_
-			* __leaf_temp__: _text number ±xxx.x_
-			* __humidity__: _text number ±xxx.x_
-			* __datetime__: _text datetime_
-			* __photo__: _file picture_
+			* __data__:
+				* __longtitude__: _text number ±xxx.xxxx_ 
+				* __latitude__: _text numer ±xx.xxxx_
+				* __moisture__: _text number ±xxx.x_
+				* __transpiration__: _text number ±xxx.xx_
+				* __air_temp__: _text number ±xxx.x_
+				* __leaf_temp__: _text number ±xxx.x_
+				* __humidity__: _text number ±xxx.x_
+				* __datetime__: _text datetime_
+				* __photo__: _file picture_
+			* __max-x__: _text numer ±xx.xxxx_
+			* __min-x__: _text numer ±xx.xxxx_
+			* __max-y__: _text number ±xxx.xxxx_ 
+			* __min-y__: _text number ±xxx.xxxx_ 
+			* __all-moist__: _two dimentional array_
+			* __all-trans__: _two dimentional array_
 		* Failed
 			* __Fail__: GetPointDetail
 
@@ -128,15 +135,16 @@ time          | datetime     |                     		   | time of acquisition
 	* Description: get points in a time range(if no points in this range, return nearest 20 points)
 	* Return
 		* Success
-			* __longtitude__: _text number ±xxx.xxxx_ 
-			* __latitude__: _text numer ±xx.xxxx_
-			* __moisture__: _text number ±xxx.x_
-			* __transpiration__: _text number ±xxx.xx_
-			* __air_temp__: _text number ±xxx.x_
-			* __leaf_temp__: _text number ±xxx.x_
-			* __humidity__: _text number ±xxx.x_
-			* __datetime__: _text datetime_
-			* __photo__: _file picture_
+			* __data__:
+				* __longtitude__: _text number ±xxx.xxxx_ 
+				* __latitude__: _text numer ±xx.xxxx_
+				* __moisture__: _text number ±xxx.x_
+				* __transpiration__: _text number ±xxx.xx_
+				* __air_temp__: _text number ±xxx.x_
+				* __leaf_temp__: _text number ±xxx.x_
+				* __humidity__: _text number ±xxx.x_
+				* __datetime__: _text datetime_
+				* __photo__: _file picture_
 		* Failed
 			* __Fail__: _GetHistoryData_
 
