@@ -174,7 +174,9 @@ def __Get_Points(time_from=(datetime.now() - timedelta(days=2)), time_to=datetim
 	try:
 		points = Sample.objects.filter(Q(time__gte=time_from), Q(time__lte=time_to))
 		if 0 == len(points):
-			points = Sample.objects.all().order_by('-time')[:15]
+			points = Sample.objects.all().order_by('-time')
+			if len(points) > 20:
+				points = points[:15]
 	
 		return points
 	except Exception as e:
