@@ -117,12 +117,16 @@ time          | datetime     |                     		   | time of acquisition
 				* __humidity__: _text number ±xxx.x_
 				* __datetime__: _text datetime_
 				* __photo__: _file picture_
-			* __max-x__: _text numer ±xx.xxxx_
-			* __min-x__: _text numer ±xx.xxxx_
-			* __max-y__: _text number ±xxx.xxxx_ 
-			* __min-y__: _text number ±xxx.xxxx_ 
-			* __all-moist__: _two dimentional array_
-			* __all-trans__: _two dimentional array_
+			* __max-x__: _text numer ±xx.xxxx max latitude_
+			* __min-x__: _text numer ±xx.xxxx min latitdue_
+			* __max-y__: _text number ±xxx.xxxx max longtitude_ 
+			* __min-y__: _text number ±xxx.xxxx min longtitude_
+			* __max_m__: _text number ±xxx.x max soil moisture_
+			* __max_t__: _text number ±xxx.x max transpiration_
+			* __min_m__: _text number ±xxx.x min soil moisture_
+			* __min_t__: _text number ±xxx.x min transpiration_
+			* __all-moist__: _two dimentional array represents interpolated value of soil moisture_
+			* __all-trans__: _two dimentional array represents interpolated value of transpiration_
 		* Failed
 			* __Fail__: GetPointDetail
 
