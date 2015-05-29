@@ -9,6 +9,7 @@ import simplejson
 import numpy as np
 from datetime import datetime, timedelta
 from scipy import interpolate
+from matplotlib.mlab import griddata
 
 from utils import *
 
@@ -74,12 +75,12 @@ def GetDataPoints(request):
 		now = datetime.now()
 		two_days_ago = now - timedelta(days=2)
 		
-		result = __Get_Data(two_days_ago, now)
+		result = __Get_Data(two_days_ago, now, now=True)
 
 		return HttpResponse(simplejson.dumps(result))
 	
 	except Exception as e:
-		print('Exception GetDataForHeatMap', e)
+		print('Exception GetDataPoints', e)
 		return generateHTTPResponse('GetDataPoints', MESSAGE.f.value)
 
 @csrf_exempt
@@ -151,12 +152,26 @@ def GetImportantData(request):
 
 ############################################################
 
-def __Get_Data(time_from, time_to):
+def __Get_Data(time_from, time_to, now=False):
 	points = Sample.objects.filter(Q(time__gte=time_from), Q(time__lte=time_to))
 	if 0 == len(points):
-		points = Sample.objects.all().order_by('-time')[:20]
+		points = Sample.objects.all().order_by('-time')[:15]
 
-	result = []
+	result = {}
+
+	if now:
+		x = []
+		y = []
+		zm = []
+		zt = []
+		for p in points:
+			x.append(float(p.latitude))
+			y.append(float(p.longtitude))
+			zm.append(float(p.moisture))
+			zt.append(float(p.transpiration))
+		result.update(__Do_Interpolate(x, y, zm, zt))
+
+	data = []
 	for p in points:
 		point = {}
 		point['id'] = p.id
@@ -170,7 +185,30 @@ def __Get_Data(time_from, time_to):
 		point['time'] = p.time.strftime(getDatetimeFormat())
 		if p.photo:
 			point['photo'] = p.photo.url
-		result.append(point)
+		data.append(point)
+
+	result['data'] = data
+
+	print('get all data')
+
+	return result
+
+
+def __Do_Interpolate(x, y, zm, zt):
+	xi = np.linspace(min(x), max(x), 512)
+	step_size = (max(x)-min(x))/512
+	yi = np.arange(min(y), max(y), step_size)
+
+	zmi = griddata(x, y, zm, xi, yi, interp='linear').tolist()
+	zti = griddata(x, y, zt, xi, yi, interp='linear').tolist()
+
+	result = {}
+	result['min-x'] = min(x)
+	result['min-y'] = min(y)
+	result['max-x'] = max(x)
+	result['max-y'] = max(y)
+	result['all-moist'] = zmi
+	result['all-trans'] = zti
 
 	return result
 
@@ -200,6 +238,8 @@ def __Get_Transpiration(leaf_temp, air_temp, humidity):
 	cwsi = (ws-(leaf_temp-air_temp))/(ws-NWSB(vpd)) # CWSI (Crop Water Stress Index)
 
 	return cwsi
+
+
 
 '''
 # generate moisture image
