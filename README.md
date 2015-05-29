@@ -171,3 +171,20 @@ time          | datetime     |                     		   | time of acquisition
 		* Failed
 			* __Fail__: _GetImportantData_
 
+* GetHeatMap
+	* Method: ```GET```
+	* Http request: ```/farm/getheatmap```
+	* Parameters:
+		* __type__: _text 'moisture' or 'transpiration'_
+	* Description: generate heat map data
+	* Return
+		* Suncess
+			* __max-x__: _text numer ±xx.xxxx max latitude_
+			* __min-x__: _text numer ±xx.xxxx min latitdue_
+			* __max-y__: _text number ±xxx.xxxx max longtitude_ 
+			* __min-y__: _text number ±xxx.xxxx min longtitude_
+			* __max_z__: _text number ±xxx.x max soil moisture or transpiration_
+			* __max_z__: _text number ±xxx.x max soil moisture or transpiration_
+			* __all-image__: _two dimentional array represents interpolated value of soil moisture or transpiration_
+		* Failed
+			* __Fail__: _GetHeatMap_

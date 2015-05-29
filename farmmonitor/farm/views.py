@@ -171,118 +171,132 @@ def GetHeatMap(request):
 ############################################################
 
 def __Get_Points(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.now()):
-	points = Sample.objects.filter(Q(time__gte=time_from), Q(time__lte=time_to))
-	if 0 == len(points):
-		points = Sample.objects.all().order_by('-time')[:15]
-
-	return points
+	try:
+		points = Sample.objects.filter(Q(time__gte=time_from), Q(time__lte=time_to))
+		if 0 == len(points):
+			points = Sample.objects.all().order_by('-time')[:15]
+	
+		return points
+	except Exception as e:
+		print('Exception __Get_Points', e)
 
 def __Get_Data(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.now(), now=False):
+	try:
+		points = __Get_Points(time_from, time_to)
+		
+		result = {}
 	
-	points = __Get_Points(time_from, time_to)
+		if now:
+			x = []
+			y = []
+			zm = []
+			zt = []
+			for p in points:
+				x.append(float(p.latitude))
+				y.append(float(p.longtitude))
+				zm.append(float(p.moisture))
+				zt.append(float(p.transpiration))
+			result.update(__Do_Interpolate(x, y, zm, zt))
 	
-	result = {}
-
-	if now:
-		x = []
-		y = []
-		zm = []
-		zt = []
+		data = []
 		for p in points:
-			x.append(float(p.latitude))
-			y.append(float(p.longtitude))
-			zm.append(float(p.moisture))
-			zt.append(float(p.transpiration))
-		result.update(__Do_Interpolate(x, y, zm, zt))
-
-	data = []
-	for p in points:
-		point = {}
-		point['id'] = p.id
-		point['longtitude'] = p.longtitude
-		point['latitude'] = p.latitude
-		point['moisture'] = p.moisture
-		point['air_temp'] = p.air_temp
-		point['leaf_temp'] = p.leaf_temp
-		point['humidity'] = p.humidity
-		point['transpiration'] = p.transpiration
-		point['time'] = p.time.strftime(getDatetimeFormat())
-		if p.photo:
-			point['photo'] = p.photo.url
-		data.append(point)
-
-	result['data'] = data
-
-	return result
+			point = {}
+			point['id'] = p.id
+			point['longtitude'] = p.longtitude
+			point['latitude'] = p.latitude
+			point['moisture'] = p.moisture
+			point['air_temp'] = p.air_temp
+			point['leaf_temp'] = p.leaf_temp
+			point['humidity'] = p.humidity
+			point['transpiration'] = p.transpiration
+			point['time'] = p.time.strftime(getDatetimeFormat())
+			if p.photo:
+				point['photo'] = p.photo.url
+			data.append(point)
+	
+		result['data'] = data
+	
+		return result
+	except Exception as e:
+		print('__Get_Data', e)
 
 
 def __Do_Interpolate(x, y, zm, zt):
-	xi = np.linspace(min(x), max(x), 512)
-	step_size = (max(x)-min(x))/512
-	yi = np.arange(min(y), max(y), step_size)
-
-	zmi = griddata(x, y, zm, xi, yi, interp='linear').tolist()
-	zti = griddata(x, y, zt, xi, yi, interp='linear').tolist()
-
-	result = {}
-	result['min-x'] = min(x)
-	result['min-y'] = min(y)
-	result['max-x'] = max(x)
-	result['max-y'] = max(y)
-	result['max-m'] = max(zm)
-	result['min-m'] = min(zm)
-	result['max-t'] = max(zt)
-	result['min-t'] = min(zt)
-	result['all-moist'] = zmi
-	result['all-trans'] = zti
-
-	return result
+	try:
+		xi = np.linspace(min(x), max(x), 512)
+		step_size = (max(x)-min(x))/512
+		yi = np.arange(min(y), max(y), step_size)
+	
+		zmi = griddata(x, y, zm, xi, yi, interp='linear').tolist()
+		zti = griddata(x, y, zt, xi, yi, interp='linear').tolist()
+	
+		result = {}
+		result['min-x'] = min(x)
+		result['min-y'] = min(y)
+		result['max-x'] = max(x)
+		result['max-y'] = max(y)
+		result['max-m'] = max(zm)
+		result['min-m'] = min(zm)
+		result['max-t'] = max(zt)
+		result['min-t'] = min(zt)
+		result['all-moist'] = zmi
+		result['all-trans'] = zti
+	
+		return result
+	except Exception as e:
+		print('__Do_Interpolate', e)
 
 def __Do_Seperate_Interpolate(x, y, z):
-	xi = np.linspace(min(x), max(x), 512)
-	step_size = (max(x)-min(x))/512
-	yi = np.arange(min(y), max(y), step_size)
-
-	zi = griddata(x, y, z, xi, yi, interp='linear').tolist()
-
-	result = {}
-	result['min-x'] = min(x)
-	result['min-y'] = min(y)
-	result['max-x'] = max(x)
-	result['max-y'] = max(y)
-	result['max-z'] = max(z)
-	result['min-z'] = min(z)
-	result['all-image'] = zi
-
-	return result
+	try:
+		xi = np.linspace(min(x), max(x), 512)
+		step_size = (max(x)-min(x))/512
+		yi = np.arange(min(y), max(y), step_size)
+	
+		zi = griddata(x, y, z, xi, yi, interp='linear').tolist()
+	
+		result = {}
+		result['min-x'] = min(x)
+		result['min-y'] = min(y)
+		result['max-x'] = max(x)
+		result['max-y'] = max(y)
+		result['max-z'] = max(z)
+		result['min-z'] = min(z)
+		result['all-image'] = zi
+	
+		return result
+	except Exception as e:
+		print('__Do_Seperate_Interpolate', e)
 
 
 
 # calculate transpiration
 def __Get_Transpiration(leaf_temp, air_temp, humidity):	
-	# a0: Intercept of water stress line for tomatoes in sunlight (Temp[degC],Pressure[kPa])
-	# a1: Slope of water stress line for tomatoes in sunlight (Temp[degC],Pressure[kPa])
-	# t_svp: Temp range for empirical SVP(Saturated Vapor Pressure) relationship 
-	# p_svp: Pressures for empirical SVP(Saturated Vapor Pressure) relationship [kPa]
-	(a0, a1) = getWSLParameter()
-	(t_svp, p_svp) = getSVPParameter()
-
-	t_svp = np.array(t_svp)
-	p_svp = np.array(p_svp)
-
-	f_svp = interpolate.interp1d(t_svp, p_svp, kind='linear') # Linearly interpolate SVP relationship
-	svp_a = f_svp(air_temp) # SVP for air temp
-	vpd = (1-(humidity/100))*svp_a # VPD (Vapor Pressure Defecit)
-
-	NWSB = lambda vpdx: a0 + a1*(vpdx) # NWSB (Non-Water Stressed Baseline)
-
-	svp_leaf0 = f_svp(air_temp+a0) # SVP for leaf at theoretical 0 transpiration
-	vpd_neg = svp_leaf0 - svp_a # distance to travel back on VPD axis to intersect with NWSB
-	ws = a0 - a1 * vpd_neg # WS (Water Stress)
-
-	cwsi = (ws-(leaf_temp-air_temp))/(ws-NWSB(vpd)) # CWSI (Crop Water Stress Index)
-
-	return cwsi
+	try:
+		# a0: Intercept of water stress line for tomatoes in sunlight (Temp[degC],Pressure[kPa])
+		# a1: Slope of water stress line for tomatoes in sunlight (Temp[degC],Pressure[kPa])
+		# t_svp: Temp range for empirical SVP(Saturated Vapor Pressure) relationship 
+		# p_svp: Pressures for empirical SVP(Saturated Vapor Pressure) relationship [kPa]
+		(a0, a1) = getWSLParameter()
+		(t_svp, p_svp) = getSVPParameter()
+	
+		t_svp = np.array(t_svp)
+		p_svp = np.array(p_svp)
+	
+		f_svp = interpolate.interp1d(t_svp, p_svp, kind='linear') # Linearly interpolate SVP relationship
+		svp_a = f_svp(air_temp) # SVP for air temp
+		vpd = (1-(humidity/100))*svp_a # VPD (Vapor Pressure Defecit)
+	
+		NWSB = lambda vpdx: a0 + a1*(vpdx) # NWSB (Non-Water Stressed Baseline)
+	
+		svp_leaf0 = f_svp(air_temp+a0) # SVP for leaf at theoretical 0 transpiration
+		vpd_neg = svp_leaf0 - svp_a # distance to travel back on VPD axis to intersect with NWSB
+		ws = a0 - a1 * vpd_neg # WS (Water Stress)
+	
+		cwsi = (ws-(leaf_temp-air_temp))/(ws-NWSB(vpd)) # CWSI (Crop Water Stress Index)
+	
+		return cwsi
+	except Exception as e:
+		print('__Get_Transpiration', e)
 
 
 
