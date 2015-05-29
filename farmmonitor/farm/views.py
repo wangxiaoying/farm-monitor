@@ -72,10 +72,10 @@ def TestHttpConnection(request):
 def GetDataPoints(request):
 	try:
 		# get data points in <2 days
-		now = datetime.now()
-		two_days_ago = now - timedelta(days=2)
+		# now = datetime.now()
+		# two_days_ago = now - timedelta(days=2)
 		
-		result = __Get_Data(two_days_ago, now, now=True)
+		result = __Get_Data(now=True)
 
 		return HttpResponse(simplejson.dumps(result))
 	
@@ -89,7 +89,7 @@ def GetHistoryData(request):
 		time_from = request.GET.get('time_from')
 		time_to = request.GET.get('time_to')
 
-		result = __Get_Data(time_from, time_to)
+		result = __Get_Data(time_from=time_from, time_to=time_to)
 
 		return HttpResponse(simplejson.dumps(result))
 
@@ -146,30 +146,54 @@ def GetImportantData(request):
 
 	except Exception as e:
 		print('Exception GetImportantData', e)
-		return generateHTTPResponse(MESSAGE.f.value)
+		return generateHTTPResponse('GetImportantData', MESSAGE.f.value)
 
 
+@csrf_exempt
+def GetHeatMap(request):
+	try:
+		hm_type = request.GET.get('type')
+		points = __Get_Points()
+		x = []
+		y = []
+		z = []
+		for p in points:
+			x.append(float(p.latitude))
+			y.append(float(p.longtitude))
+			z.append(float(getattr(p, hm_type)))
+
+		result = __Do_Seperate_Interpolate(x, y, z)
+		return HttpResponse(simplejson.dumps(result))
+	except Exception as e:
+		print('Exception GetHeatMap', e)
+		return generateHTTPResponse('GetHeatMap', MESSAGE.f.value)
 
 ############################################################
 
-def __Get_Data(time_from, time_to, now=False):
+def __Get_Points(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.now()):
 	points = Sample.objects.filter(Q(time__gte=time_from), Q(time__lte=time_to))
 	if 0 == len(points):
 		points = Sample.objects.all().order_by('-time')[:15]
 
+	return points
+
+def __Get_Data(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.now(), now=False):
+	
+	points = __Get_Points(time_from, time_to)
+	
 	result = {}
 
-	if now:
-		x = []
-		y = []
-		zm = []
-		zt = []
-		for p in points:
-			x.append(float(p.latitude))
-			y.append(float(p.longtitude))
-			zm.append(float(p.moisture))
-			zt.append(float(p.transpiration))
-		result.update(__Do_Interpolate(x, y, zm, zt))
+	# if now:
+	# 	x = []
+	# 	y = []
+	# 	zm = []
+	# 	zt = []
+	# 	for p in points:
+	# 		x.append(float(p.latitude))
+	# 		y.append(float(p.longtitude))
+	# 		zm.append(float(p.moisture))
+	# 		zt.append(float(p.transpiration))
+	# 	result.update(__Do_Interpolate(x, y, zm, zt))
 
 	data = []
 	for p in points:
@@ -188,8 +212,6 @@ def __Get_Data(time_from, time_to, now=False):
 		data.append(point)
 
 	result['data'] = data
-
-	print('get all data')
 
 	return result
 
@@ -215,6 +237,25 @@ def __Do_Interpolate(x, y, zm, zt):
 	result['all-trans'] = zti
 
 	return result
+
+def __Do_Seperate_Interpolate(x, y, z):
+	xi = np.linspace(min(x), max(x), 512)
+	step_size = (max(x)-min(x))/512
+	yi = np.arange(min(y), max(y), step_size)
+
+	zi = griddata(x, y, z, xi, yi, interp='linear').tolist()
+
+	result = {}
+	result['min-x'] = min(x)
+	result['min-y'] = min(y)
+	result['max-x'] = max(x)
+	result['max-y'] = max(y)
+	result['max-z'] = max(z)
+	result['min-z'] = min(z)
+	result['all-image'] = zi
+
+	return result
+
 
 
 # calculate transpiration
