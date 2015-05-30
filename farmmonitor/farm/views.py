@@ -188,17 +188,17 @@ def __Get_Data(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.
 		
 		result = {}
 	
-		if now:
-			x = []
-			y = []
-			zm = []
-			zt = []
-			for p in points:
-				x.append(float(p.latitude))
-				y.append(float(p.longtitude))
-				zm.append(float(p.moisture))
-				zt.append(float(p.transpiration))
-			result.update(__Do_Interpolate(x, y, zm, zt))
+		# if now:
+		# 	x = []
+		# 	y = []
+		# 	zm = []
+		# 	zt = []
+		# 	for p in points:
+		# 		x.append(float(p.latitude))
+		# 		y.append(float(p.longtitude))
+		# 		zm.append(float(p.moisture))
+		# 		zt.append(float(p.transpiration))
+		# 	result.update(__Do_Interpolate(x, y, zm, zt))
 	
 		data = []
 		for p in points:
