@@ -15,6 +15,7 @@ class Sample(models.Model):
 	transpiration = models.DecimalField(max_digits=5, decimal_places=2)
 	photo = models.FileField(upload_to=photo_file, blank=True)
 	time = models.DateTimeField()
+	both = models.DecimalField(max_digits=4, decimal_places=1)
 
 	def __unicode__(self):
 		return 'id: %d' % (self.id)

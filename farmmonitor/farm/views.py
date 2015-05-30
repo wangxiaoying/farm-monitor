@@ -30,7 +30,8 @@ def NewSample(request):
 		# transpiration = __Get_Transpiration(leaf_temp, air_temp, humidity)
 
 		new_sample = Sample(longtitude=longtitude, latitude=latitude, moisture=moisture,
-			air_temp=air_temp, leaf_temp=leaf_temp, humidity=humidity, transpiration=transpiration, time=dt)
+			air_temp=air_temp, leaf_temp=leaf_temp, humidity=humidity, transpiration=transpiration, time=dt, 
+			both=moisture-transpiration)
 		new_sample.save()
 
 		form = PhotoForm(request.POST, request.FILES)
@@ -225,8 +226,8 @@ def __Get_Data(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.
 
 def __Do_Interpolate(x, y, zm, zt):
 	try:
-		xi = np.linspace(min(x), max(x), 512)
-		step_size = (max(x)-min(x))/512
+		xi = np.linspace(min(x), max(x), getWidthPixelNum())
+		step_size = (max(x)-min(x))/getWidthPixelNum()
 		yi = np.arange(min(y), max(y), step_size)
 	
 		zmi = griddata(x, y, zm, xi, yi, interp='linear').tolist()
@@ -248,10 +249,11 @@ def __Do_Interpolate(x, y, zm, zt):
 	except Exception as e:
 		print('__Do_Interpolate', e)
 
+
 def __Do_Seperate_Interpolate(x, y, z):
 	try:
-		xi = np.linspace(min(x), max(x), 512)
-		step_size = (max(x)-min(x))/512
+		xi = np.linspace(min(x), max(x), getWidthPixelNum())
+		step_size = (max(x)-min(x))/getWidthPixelNum()
 		yi = np.arange(min(y), max(y), step_size)
 	
 		zi = griddata(x, y, z, xi, yi, interp='linear').tolist()
@@ -268,7 +270,6 @@ def __Do_Seperate_Interpolate(x, y, z):
 		return result
 	except Exception as e:
 		print('__Do_Seperate_Interpolate', e)
-
 
 
 # calculate transpiration

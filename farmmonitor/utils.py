@@ -37,6 +37,8 @@ def getDatetimeFormat():
 def getDateFormat():
 	return ('%Y-%m-%d')
 
+def getWidthPixelNum():
+	return 512
 # def getImpoDataMax(x):
 # 	return {
 #         'transpiration': 20,
