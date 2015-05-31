@@ -178,8 +178,9 @@ def __Get_Points(time_from=(datetime.now() - timedelta(days=2)), time_to=datetim
 			nrst_point = Sample.objects.latest('time')
 			# print(type(nrst_point), nrst_point)
 			nrst_day = nrst_point.time.date()
+			print('nrst_day in string', str(nrst_day))
 			# print(type(nrst_day), nrst_day)
-			points = Sample.objects.filter(time__contains=nrst_day)
+			points = Sample.objects.filter(time__contains=str(nrst_day))
 			# print(len(points))
 
 		return points
