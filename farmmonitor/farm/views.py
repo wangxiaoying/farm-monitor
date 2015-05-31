@@ -175,10 +175,13 @@ def __Get_Points(time_from=(datetime.now() - timedelta(days=2)), time_to=datetim
 	try:
 		points = Sample.objects.filter(Q(time__gte=time_from), Q(time__lte=time_to))
 		if 0 == len(points):
-			points = Sample.objects.all().order_by('-time')
-			if len(points) > 20:
-				points = points[:15]
-	
+			nrst_point = Sample.objects.latest('time')
+			# print(type(nrst_point), nrst_point)
+			nrst_day = nrst_point.time.date()
+			# print(type(nrst_day), nrst_day)
+			points = Sample.objects.filter(time__contains=nrst_day)
+			# print(len(points))
+
 		return points
 	except Exception as e:
 		print('Exception __Get_Points', e)
