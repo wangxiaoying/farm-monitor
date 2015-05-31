@@ -188,7 +188,9 @@ def __Get_Points(time_from=(datetime.now() - timedelta(days=2)), time_to=datetim
 
 def __Get_Data(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.now(), now=False):
 	try:
+		print(time_from, time_to)
 		points = __Get_Points(time_from, time_to)
+		print(len(points))
 		
 		result = {}
 	
