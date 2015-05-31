@@ -7,7 +7,7 @@ from django.db.models import Q
 import time
 import simplejson
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from scipy import interpolate
 from matplotlib.mlab import griddata
 
@@ -180,7 +180,9 @@ def __Get_Points(time_from=(datetime.now() - timedelta(days=2)), time_to=datetim
 			nrst_day = nrst_point.time.date()
 			print('nrst_day in string', str(nrst_day))
 			# print(type(nrst_day), nrst_day)
-			points = Sample.objects.filter(time__contains=str(nrst_day))
+			# points = Sample.objects.filter(time__contains=str(nrst_day))
+			# points = Sample.objects.filter(time__year=nrst_day.year, time__month=nrst_day.month, time__day=nrst_day.day)
+			points = Sample.objects.filter(time__range=(datetime.combine(nrst_day, time.min), datetime.combine(nrst_day, time.max)))
 			# print(len(points))
 
 		return points
