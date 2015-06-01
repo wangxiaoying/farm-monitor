@@ -54,6 +54,6 @@ def getImpoDataMin(x):
 
 def getShiftValue(x):
 	return{
-		'longtitude': 0.0001,
-		'latitude': 0.00015,
+		'longtitude': 0,
+		'latitude': 0,
 	}[x]
