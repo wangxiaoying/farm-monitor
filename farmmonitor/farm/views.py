@@ -238,8 +238,8 @@ def __Get_Data(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.
 		for p in points:
 			point = {}
 			point['id'] = p.id
-			point['longtitude'] = float(p.longtitude)+0.0001
-			point['latitude'] = float(p.latitude)+0.00015
+			point['longtitude'] = float(p.longtitude)+getShiftValue('lontitude')
+			point['latitude'] = float(p.latitude)+getShiftValue('latitude')
 			point['moisture'] = p.moisture
 			point['air_temp'] = p.air_temp
 			point['leaf_temp'] = p.leaf_temp
@@ -267,10 +267,10 @@ def __Do_Interpolate(x, y, zm, zt):
 		zti = griddata(x, y, zt, xi, yi, interp='linear').tolist()
 	
 		result = {}
-		result['min-x'] = min(x)
-		result['min-y'] = min(y)
-		result['max-x'] = max(x)
-		result['max-y'] = max(y)
+		result['min-x'] = min(x)+getShiftValue('latitude')
+		result['min-y'] = min(y)+getShiftValue('longtitude')
+		result['max-x'] = max(x)+getShiftValue('latitude')
+		result['max-y'] = max(y)+getShiftValue('longtitude')
 		result['max-m'] = max(zm)
 		result['min-m'] = min(zm)
 		result['max-t'] = max(zt)

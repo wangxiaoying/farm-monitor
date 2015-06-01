@@ -51,3 +51,9 @@ def getImpoDataMin(x):
 		'transpiration': 50,
 		'moisture': 60,
 	}[x]
+
+def getShiftValue(x):
+	return{
+		'longtitude': 0.0001,
+		'latitude': 0.00015,
+	}[x]
