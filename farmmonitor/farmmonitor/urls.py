@@ -14,6 +14,7 @@ farm_patterns = patterns('farm.views',
 	url(r'^farm/gethistory$', 'GetHistoryData'),
 	url(r'^farm/getimpodata$', 'GetImportantData'),
 	url(r'^farm/getheatmap$', 'GetHeatMap'),
+	url(r'^farm/deletepoints$', 'DeleteFakePoints'),
 	# url(r'^farm/newgrid$', 'NewGrid'),
 	# url(r'^farm/newmoisture$', 'NewMoisture'),
 )

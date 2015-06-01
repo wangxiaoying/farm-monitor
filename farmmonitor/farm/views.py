@@ -4,7 +4,7 @@ from farm.forms import *
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 
-import time
+import time as single_time
 import simplejson
 import numpy as np
 from datetime import datetime, timedelta, time
@@ -24,8 +24,8 @@ def NewSample(request):
 		leaf_temp = float(request.POST.get('leaf_temp'))
 		humidity = float(request.POST.get('humidity'))
 
-		date_time = time.strptime(request.POST.get('datetime'), '%m.%d.%Y %H%M.%S')
-		dt = datetime.fromtimestamp(time.mktime(date_time))
+		date_time = single_time.strptime(request.POST.get('datetime'), '%m.%d.%Y %H%M.%S')
+		dt = datetime.fromtimestamp(single_time.mktime(date_time))
 
 		# transpiration = __Get_Transpiration(leaf_temp, air_temp, humidity)
 
@@ -168,6 +168,17 @@ def GetHeatMap(request):
 	except Exception as e:
 		print('Exception GetHeatMap', e)
 		return generateHTTPResponse('GetHeatMap', MESSAGE.f.value)
+
+@csrf_exempt
+def DeleteFakePoints(request):
+	try:
+		last_id = request.GET.get('id')
+		Sample.objects.filter(id__gt=last_id).delete()
+
+		return generateHTTPResponse('DeleteFakePoint', MESSAGE.s.value)
+	except Exception as e:
+		print('Exception DeleteFakePoint', e)
+		return generateHTTPResponse('DeleteFakePoint', MESSAGE.f.value)
 
 ############################################################
 
