@@ -180,6 +180,20 @@ def DeleteFakePoints(request):
 		print('Exception DeleteFakePoint', e)
 		return generateHTTPResponse('DeleteFakePoint', MESSAGE.f.value)
 
+def ResetPointPosition(request):
+	try:
+		last_id = request.GET.get('id')
+
+		points = Sample.objects.filter(id__gt=last_id)
+		for p in points:
+			p.latitude = p.latitude+0.00015
+			p.longtitude = p.longtitude+0.0001
+
+		return generateHTTPResponse('ResetPointPosition', MESSAGE.s.value)
+	except Exception as e:
+		print('ResetPointPosition', e)
+		return generateHTTPResponse('ResetPointPosition', MESSAGE.f.value)
+
 ############################################################
 
 def __Get_Points(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.now()):
@@ -224,8 +238,8 @@ def __Get_Data(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.
 		for p in points:
 			point = {}
 			point['id'] = p.id
-			point['longtitude'] = p.longtitude
-			point['latitude'] = p.latitude
+			point['longtitude'] = float(p.longtitude)+0.0001
+			point['latitude'] = float(p.latitude)+0.00015
 			point['moisture'] = p.moisture
 			point['air_temp'] = p.air_temp
 			point['leaf_temp'] = p.leaf_temp
