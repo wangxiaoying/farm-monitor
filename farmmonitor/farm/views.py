@@ -238,7 +238,7 @@ def __Get_Data(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.
 		for p in points:
 			point = {}
 			point['id'] = p.id
-			point['longtitude'] = float(p.longtitude)+getShiftValue('lontitude')
+			point['longtitude'] = float(p.longtitude)+getShiftValue('longtitude')
 			point['latitude'] = float(p.latitude)+getShiftValue('latitude')
 			point['moisture'] = p.moisture
 			point['air_temp'] = p.air_temp
