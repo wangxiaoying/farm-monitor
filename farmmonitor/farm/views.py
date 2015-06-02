@@ -159,9 +159,12 @@ def GetHeatMap(request):
 		y = []
 		z = []
 		for p in points:
-			x.append(float(p.latitude))
-			y.append(float(p.longtitude))
+			x.append(float(p.latitude)+getShiftValue('latitude'))
+			y.append(float(p.longtitude)+getShiftValue('longtitude'))
 			z.append(float(getattr(p, hm_type)))
+
+		print('GetHeatMap', x)
+		print('GetHeatMap', y)
 
 		result = __Do_Seperate_Interpolate(x, y, z)
 		return HttpResponse(simplejson.dumps(result))
@@ -186,8 +189,8 @@ def ResetPointPosition(request):
 
 		points = Sample.objects.filter(id__gt=last_id)
 		for p in points:
-			p.latitude = p.latitude+0.00015
-			p.longtitude = p.longtitude+0.0001
+			p.latitude = p.latitude+getShiftValue('latitude')
+			p.longtitude = p.longtitude+getShiftValue('longtitude')
 
 		return generateHTTPResponse('ResetPointPosition', MESSAGE.s.value)
 	except Exception as e:
@@ -267,10 +270,11 @@ def __Do_Interpolate(x, y, zm, zt):
 		zti = griddata(x, y, zt, xi, yi, interp='linear').tolist()
 	
 		result = {}
-		result['min-x'] = min(x)+getShiftValue('latitude')
-		result['min-y'] = min(y)+getShiftValue('longtitude')
-		result['max-x'] = max(x)+getShiftValue('latitude')
-		result['max-y'] = max(y)+getShiftValue('longtitude')
+
+		result['min-x'] = min(x)
+		result['min-y'] = min(y)
+		result['max-x'] = max(x)
+		result['max-y'] = max(y)
 		result['max-m'] = max(zm)
 		result['min-m'] = min(zm)
 		result['max-t'] = max(zt)
@@ -290,7 +294,11 @@ def __Do_Seperate_Interpolate(x, y, z):
 		yi = np.arange(min(y), max(y), step_size)
 	
 		zi = griddata(x, y, z, xi, yi, interp='linear').tolist()
-	
+		
+		print('__Do_Interpolate', x)
+		print('__Do_Interpolate', y)
+		print(min(x), min(y), max(x), max(y))
+
 		result = {}
 		result['min-x'] = min(x)
 		result['min-y'] = min(y)
