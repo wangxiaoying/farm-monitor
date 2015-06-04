@@ -18,6 +18,15 @@ def NewSample(request):
 	try:
 		longtitude = float(request.POST.get('longtitude'))
 		latitude = float(request.POST.get('latitude'))
+
+		if 0 == longtitude or 0 == latitude:
+			return generateHTTPResponse('NewSample position 0', MESSAGE.f.value)
+
+		if longtitude > 0:
+			longtitude = -longtitude
+		if latitude < 0:
+			latitude = -latitude
+
 		moisture = float(request.POST.get('moisture'))
 		transpiration = float(request.POST.get('transpiration'))
 		air_temp = float(request.POST.get('air_temp'))
