@@ -168,8 +168,8 @@ def GetHeatMap(request):
 		y = []
 		z = []
 		for p in points:
-			y.append(float(p.latitude)+getShiftValue('latitude'))
-			x.append(float(p.longtitude)+getShiftValue('longtitude'))
+			x.append(float(p.latitude)+getShiftValue('latitude'))
+			y.append(float(p.longtitude)+getShiftValue('longtitude'))
 			z.append(float(getattr(p, hm_type)))
 
 		print('GetHeatMap', x)
