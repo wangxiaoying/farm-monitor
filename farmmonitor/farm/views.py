@@ -206,6 +206,27 @@ def ResetPointPosition(request):
 		print('ResetPointPosition', e)
 		return generateHTTPResponse('ResetPointPosition', MESSAGE.f.value)
 
+@csrf_exempt
+def UpdateDate(request):
+	try:
+		target = request.POST.get('target')
+		print(target)
+
+		date = datetime.strptime(target, '%Y-%m-%d')
+		today = datetime.now().date()
+
+		points = Sample.objects.filter(time__range=(date, date+timedelta(days=1)))
+		for p in points:
+			time = p.time.time()
+			p.time = datetime.combine(today, time)
+			p.save()
+
+		return generateHTTPResponse('UpdateDate', MESSAGE.s.value)
+	except Exception as e:
+		print('UpdateDate', e)
+		return generateHTTPResponse('UpdateDate', MESSAGE.f.value)
+
+
 ############################################################
 
 def __Get_Points(time_from=(datetime.now() - timedelta(days=2)), time_to=datetime.now()):
